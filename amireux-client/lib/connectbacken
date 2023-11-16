@@ -1,0 +1,26 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+const String backendUrl = 'http://127.0.0.1:5000/send_message_to_character_ai';
+
+Future<String> sendMessage(String message) async {
+  final url = Uri.parse(backendUrl);
+  final response = await http.post(
+    url,
+    headers: {  "Access-Control-Allow-Origin": "*", // Required for CORS support to work
+                "Access-Control-Allow-Credentials": "true", // Required for cookies, authorization headers with HTTPS
+                "Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
+                "Access-Control-Allow-Methods": "POST, OPTIONS"// Required for CORS support to work
+    },
+    body: json.encode({'message': message}),
+  );
+
+  if (response.statusCode == 200) {
+    final responseData = json.decode(response.body);
+    // 假设后端返回了包含 AI 回复的 JSON 对象
+    return responseData['aiResponse'];
+  } else {
+    throw Exception('Failed to send message');
+  }
+}
